@@ -5,14 +5,14 @@
   <link href="https://jaisong1n.com/" rel="alternate" type="text/html"/>
   <link href="https://jaisong1n.com/atom.xml" rel="self" type="application/atom+xml"/>
   <id>https://jaisong1n.com/</id>
-  <updated>2026-08-25T15:22:17.000Z</updated>
+  <updated>2026-08-25T15:33:15.000Z</updated>
   <language>zh_CN</language>
   <entry>
     <title>只让模型处理不确定性：一次 Agent 工具调用与上下文优化复盘</title>
     <link href="https://jaisong1n.com/posts/agent-tool-calling-context-optimization/" rel="alternate" type="text/html"/>
     <id>https://jaisong1n.com/posts/agent-tool-calling-context-optimization/</id>
     <published>2026-08-25T07:37:02.000Z</published>
-    <updated>2026-08-25T15:22:14.000Z</updated>
+    <updated>2026-08-25T15:33:13.000Z</updated>
     <summary>在一个基于 Spring AI 的微信助手里，我把确定的业务流程、会话状态和高置信路由逐步移出模型循环。本文复盘这次边界重划：如何减少无意义的模型调用、控制 Tool Schema 和历史上下文，并让 Agent 更稳定、更容易维护。</summary>
     <content type="html"><![CDATA[<p>最近我在做一个基于 Spring AI 的微信智能助手。项目早期的思路很直接：接入大模型，把天气、健康档案、冰箱库存、菜谱、营养计算、运动计划、提醒等能力包装成 <code>@Tool</code>，再交给模型自己选择。</p>
 <p>刚开始，这种开发体验确实很顺。写一个 Service，外面包一层 Tool，注册到 Spring AI，模型马上就多了一项能力。我当时很自然地认为：Tool 越多，Agent 就越强。</p>
@@ -165,14 +165,14 @@ OpenItems:
     <author>
       <name>JaisonG1n</name>
     </author>
-    <category term="Uncategorized"></category>
+    <category term="AI与Agent"></category>
   </entry>
   <entry>
     <title>Tool、Skill 与 MCP：能力、工作流与标准协议，不在同一个层次</title>
     <link href="https://jaisong1n.com/posts/tool-skill-mcp-capability-workflow-protocol/" rel="alternate" type="text/html"/>
     <id>https://jaisong1n.com/posts/tool-skill-mcp-capability-workflow-protocol/</id>
     <published>2026-08-04T03:49:37.000Z</published>
-    <updated>2026-08-25T15:22:14.000Z</updated>
+    <updated>2026-08-25T15:33:14.000Z</updated>
     <summary>Tool、Skill 与 MCP：能力、工作流与标准协议，不在同一个层次 打开任意一个 Agent 相关文档， […]</summary>
     <content type="html"><![CDATA[<h1>Tool、Skill 与 MCP：能力、工作流与标准协议，不在同一个层次</h1>
 <p>打开任意一个 Agent 相关文档，你都会同时看到三个词：Tool、Skill、MCP。有人把 Skill 当成”更复杂的 Tool”，有人把 MCP 称为”插件系统”，还有人以为接入 MCP 就不需要本地工具了。这些说法不是完全错误，但都混淆了一个关键事实：<strong>三者解决的并不是同一个问题，它们位于同一个 Agent 系统的不同层次</strong>。</p>
@@ -322,14 +322,14 @@ Agent 是使用工具、遵循 Skill、与用户交互的主体；Tool 是它的
     <author>
       <name>JaisonG1n</name>
     </author>
-    <category term="Uncategorized"></category>
+    <category term="AI与Agent"></category>
   </entry>
   <entry>
     <title>从手动发布到自动部署：我的个人博客工作流升级记录</title>
     <link href="https://jaisong1n.com/posts/wordpress-astro-auto-deploy-workflow/" rel="alternate" type="text/html"/>
     <id>https://jaisong1n.com/posts/wordpress-astro-auto-deploy-workflow/</id>
     <published>2026-07-31T07:41:50.000Z</published>
-    <updated>2026-08-25T15:22:17.000Z</updated>
+    <updated>2026-08-25T15:33:15.000Z</updated>
     <summary>记录个人博客从手动触发构建升级为 WordPress 发布后自动调用 GitHub Actions，并由 Astro 完成同步、构建和部署的过程。</summary>
     <content type="html"><![CDATA[<h2>为什么要改造发布流程</h2>
 <p>过去我在 WordPress 中完成一篇文章的修改后，还要专门切换到构建页面手动触发流程。这个动作本身并不复杂，但很容易在赶时间时被遗漏：内容已经保存，线上页面却仍然是旧版本。写作和发布被拆成两段，注意力也被迫从文章本身转移到一次次确认构建状态上。随着文章更新越来越频繁，我希望把这段重复操作交给稳定的自动化链路，让自己把时间留给选题、表达和审核。</p>
@@ -353,7 +353,7 @@ Agent 是使用工具、遵循 Skill、与用户交互的主体；Tool 是它的
     <author>
       <name>JaisonG1n</name>
     </author>
-    <category term="Uncategorized"></category>
+    <category term="开发笔记"></category>
   </entry>
   <entry>
     <title>JaisonG1n 博客测试文章</title>
