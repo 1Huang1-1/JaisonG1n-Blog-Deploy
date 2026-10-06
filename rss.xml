@@ -103,6 +103,10 @@
 &lt;p&gt;但“今天三个人，预算 80 元，帮我安排一顿晚饭”完全不同。它背后可能需要读取健康档案和库存，生成菜谱，计算食材需求与营养，生成采购清单，最后校验预算。如果把这些步骤全部交给模型自由编排，执行过程就会变成反复的 &lt;code&gt;LLM → Tool → LLM&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;从演示效果看，这很有 Agent 的味道；从工程角度看，它却把一个已知流程重新变成了概率问题。调用顺序可能变化，某一步可能遗漏，同一个只读工具可能重复执行，模型也可能在拿到中间结果后重新规划整条链路。&lt;/p&gt;
 &lt;p&gt;一旦流程已经足够确定，让模型继续负责流程编排，通常不会增加价值，只会增加延迟、Token 消耗和不确定性。&lt;/p&gt;
+&lt;p&gt;为看清这次重构中流程控制权的变化，可以把自由 Tool Loop 与 BusinessSkill 编排放在一起比较：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://cms.jaisong1n.com/wp-content/uploads/2026/10/preview-3.png&quot; alt=&quot;对比图展示自由 Tool Loop 反复由模型选择下一步，与 Router 和 BusinessSkill 按确定步骤编排领域服务、模型处理语言理解和歧义的流程。&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;自由 Tool Loop 让模型反复规划工具顺序；BusinessSkill 把确定步骤交给代码，模型仍负责语言理解与解释。&lt;/p&gt;
+&lt;p&gt;这并不意味着移除模型：已知步骤由 Router 和 BusinessSkill 稳定编排，模型继续负责自然语言理解、歧义判断与结果解释。&lt;/p&gt;
 &lt;h2&gt;Tool 不是免费的能力列表&lt;/h2&gt;
 &lt;p&gt;过去谈 Token 优化，我首先想到的是聊天历史。但一次 Agent 请求里，模型看到的不只是用户的当前消息，还可能包括 System Prompt、Tool Definitions、参数 JSON Schema、Memory、RAG 结果、历史消息和上一轮 Tool Result。&lt;/p&gt;
 &lt;p&gt;Java 里一个看似简单的方法：&lt;/p&gt;
@@ -164,6 +168,10 @@ public PantryResult getPantry(...) {
 + 最近真正相关的消息
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;聊天历史只是 Context 的一种原材料，而不是 Context 本身。&lt;/p&gt;
+&lt;p&gt;一轮请求真正需要的 Context，是由多种材料筛选和整理出来的，而不是把聊天记录原样搬给模型：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://cms.jaisong1n.com/wp-content/uploads/2026/10/preview-2.png&quot; alt=&quot;流程图展示聊天消息、Tool Schema、SkillSession 和精简 Tool Result 经相关性筛选与状态整理后，形成当前目标、状态、约束和必要事实；无关历史仍保留在业务系统。&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Context 由当前目标、任务状态和相关事实组装；完整聊天历史、无关 Schema 与内部字段不会默认全部交给模型。&lt;/p&gt;
+&lt;p&gt;筛选只决定本轮向模型提供什么，并不删除原始会话或业务数据；未相关的信息仍保存在系统中，需要时再使用。&lt;/p&gt;
 &lt;h2&gt;用 SkillSession 保存状态，而不是让模型反复回忆&lt;/h2&gt;
 &lt;p&gt;以晚餐规划为例，与其让模型每轮从历史里重新寻找人数、预算、忌口和执行进度，不如把这些信息直接保存为结构化会话状态：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;skill: DinnerBudgetPlanningSkill
