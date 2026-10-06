@@ -5,7 +5,7 @@
   <link href="https://jaisong1n.com/" rel="alternate" type="text/html"/>
   <link href="https://jaisong1n.com/atom.xml" rel="self" type="application/atom+xml"/>
   <id>https://jaisong1n.com/</id>
-  <updated>2026-10-06T17:39:11.000Z</updated>
+  <updated>2026-10-06T18:29:48.000Z</updated>
   <language>zh_CN</language>
   <entry>
     <title>了解 Jev 之后，我开始重新思考 AI 是否总要生成文字</title>
@@ -270,7 +270,7 @@ OpenItems:
     <link href="https://jaisong1n.com/posts/tool-skill-mcp-capability-workflow-protocol/" rel="alternate" type="text/html"/>
     <id>https://jaisong1n.com/posts/tool-skill-mcp-capability-workflow-protocol/</id>
     <published>2026-08-04T03:49:37.000Z</published>
-    <updated>2026-08-25T15:33:14.000Z</updated>
+    <updated>2026-10-06T18:29:48.000Z</updated>
     <summary>Tool、Skill 与 MCP：能力、工作流与标准协议，不在同一个层次 打开任意一个 Agent 相关文档， […]</summary>
     <content type="html"><![CDATA[<h1>Tool、Skill 与 MCP：能力、工作流与标准协议，不在同一个层次</h1>
 <p>打开任意一个 Agent 相关文档，你都会同时看到三个词：Tool、Skill、MCP。有人把 Skill 当成”更复杂的 Tool”，有人把 MCP 称为”插件系统”，还有人以为接入 MCP 就不需要本地工具了。这些说法不是完全错误，但都混淆了一个关键事实：<strong>三者解决的并不是同一个问题，它们位于同一个 Agent 系统的不同层次</strong>。</p>
@@ -308,10 +308,11 @@ OpenItems:
 </tbody>
 </table>
 <p>一个关键前提必须先说清：<strong>Skill 不是所有 AI 产品共同遵循的统一技术标准</strong>。OpenAI 的”tools”、Anthropic 的”tool use”、OpenClaw 的 Skill 目录、MCP 的 prompts——它们对”能力”和”工作流”的包装方式各不相同。后文凡是提到 Skill，指的是本仓库这类”以 SKILL.md 描述任务规则”的实现，不代表所有平台都相同。</p>
-<p><em>图：Tool、Skill 与 MCP 的三层关系总览。上层是 Agent 与用户意图，中层是 Skill 的任务编排，下层是本地 Tool 与 MCP 标准连接两条能力供给路径；图片由 qwen-image-2.0 生成，文字与箭头细节等待人工核验。</em></p>
+<p>为避免把名称相近的概念混在一起，先看它们在 Agent 运行时各自处于什么位置。</p>
+<p><img src="https://cms.jaisong1n.com/wp-content/uploads/2026/10/preview.png" alt="关系图展示用户请求进入 Agent，Skill 提供任务规则，本地 Tool 直接执行动作，MCP Client 连接 MCP Server 并获取 Tools、Resources、Prompts。" /></p>
+<p>图 1：Tool 负责执行具体动作，Skill 负责组织任务流程，MCP 负责标准连接；本地 Tool 与 MCP Server 提供的能力可以并存。作者依据本文中的 OpenClaw 实现原创整理。</p>
+<p>从图中可以看到，Skill 指导 Agent 如何完成任务，Tool 执行动作，MCP 为外部能力提供标准连接；本地 Tool 和 MCP Tool 可以共存。它们承担不同职责，不是互相替代的关系。</p>
 <h2>Tool：让模型真正执行动作</h2>
-<p><img src="https://cms.jaisong1n.com/wp-content/uploads/2026/08/mcp-progressive-discovery.png" alt="MCP 工具按需发现流程" /></p>
-<p>MCP 官方文档对 Tool 调用流程的示意：按需发现、检查与调用三阶段。来源：Model Context Protocol project，许可 CC BY 4.0，未修改。</p>
 <p>大模型本身只能输出文本。要让它查询数据库、调用 API、读写文件，就需要把”动作”包装成模型可调用、可校验、可反馈的对象——这就是 Tool。</p>
 <p>Tool 的核心特征有四条：</p>
 <ol>
@@ -334,8 +335,6 @@ OpenItems:
 </ul>
 <p><strong>Tool 不等于自然语言能力</strong>：它把”执行”从”表达”中分离出来，是 Agent 能够行动的物理基础。</p>
 <h2>Skill：把工具组织成可重复的任务方法</h2>
-<p><img src="https://cms.jaisong1n.com/wp-content/uploads/2026/08/output.png" alt="Skill Workflow 与 Tool 执行的分工" /></p>
-<p>Skill 负责编排（Figure Spec、Prompt、审查规则），Tool 负责真实执行（DashScope 生图）。本站原创，根据 openclaw-blog-agent 实际实现整理。</p>
 <p>Tool 解决了”能不能做”，但没解决”该怎么做、按什么顺序、受什么约束”。当任务有一类稳定的流程——比如”写一篇 AI 科技日报”或”为文章生成配图”——需要把规则、步骤、模板和调用条件固化下来，这就是 Skill。</p>
 <p>Skill 更接近<strong>任务说明书</strong>：它描述目标、步骤、边界和判断标准，本身不一定执行真实动作。Skill 通常包含：</p>
 <ul>
@@ -350,14 +349,16 @@ OpenItems:
 <p>Skill 的另一个特征是<strong>可组合性</strong>：一个 Skill 可以调用另一个 Skill 的结果。本仓库里 <code>jaisong1n-blog</code> 负责识别任务类型并决定调用哪个 Skill，<code>academic-figure-prompt</code> 负责配图规划，<code>blog-news-research</code> 负责研究——它们各管一段，通过 Agent 串联成完整流程。这种”任务分解 + 各自为政”的组织方式，正是 Skill 与”把所有逻辑写进一个 Tool”的差别所在。</p>
 <p>另一个诚实的边界：当前博客 Agent 的 Skill 只能做规划和 Prompt，<strong>WordPress 媒体上传并未实现</strong>——所以”生成图片并插入文章”目前止步于”生成本地图片 + 返回路径”，这一点不能因为文章叙事而写成已实现。</p>
 <h2>MCP：解决外部能力如何标准连接</h2>
-<p><img src="https://cms.jaisong1n.com/wp-content/uploads/2026/08/mcp-simple-diagram-scaled.png" alt="MCP 的 Client/Server 架构与 Tools、Resources、Prompts 三类能力" /></p>
-<p>MCP 的 Client/Server 结构：Host（AI 应用）通过标准协议连接 Server，Server 暴露 Tools、Resources、Prompts 三类能力。来源：Model Context Protocol project，许可 CC BY 4.0，未修改。</p>
 <p>当你要接的不是一个 API，而是一整类外部系统（数据库、GitHub、搜索服务）时，逐个写适配代码会变得昂贵。MCP（Model Context Protocol）的定位是：<strong>一个开放的、标准化的连接协议</strong>，让 AI 应用通过统一方式连接外部数据源与工具。官方文档把它类比为”AI 应用的 USB-C 接口”。</p>
 <p>MCP 的核心结构是 <strong>Client 与 Server</strong>：</p>
 <ul>
 <li>Client 是 AI 应用（如 Claude、ChatGPT、IDE）；</li>
 <li>Server 暴露能力，能力分为三类（官方规范定义）：<strong>tools</strong>（模型可执行的函数）、<strong>resources</strong>（提供上下文的数据，按 URI 标识）、<strong>prompts</strong>（可复用的模板化消息与工作流）。</li>
 </ul>
+<p>一次 MCP Tool 调用可以拆成下面四步：先发现可用定义，再由模型选择并组织参数，随后由客户端发起协议调用，最后把结果交回对话。</p>
+<p><img src="https://cms.jaisong1n.com/wp-content/uploads/2026/10/preview-1.png" alt="四步流程图展示客户端发现工具、模型选择工具并生成参数、客户端调用 MCP Server、Server 返回结果后客户端继续对话。" /></p>
+<p>图 2：MCP Client 先取得可用 Tool 定义；模型提出调用请求，客户端通过 tools/call 与 Server 往返并把结果接回对话。根据 MCP TypeScript SDK 官方文档整理并重绘。</p>
+<p>图里的关键边界是：模型发起调用意图，但协议请求由 Client 执行，Server 的结果再由 Host 交还模型。Tool 定义通常在连接初始化或刷新阶段发现，并不意味着每次调用前都重新发现一次。</p>
 <p>需要特别说清 MCP 的三条边界：</p>
 <ol>
 <li><strong>MCP 解决的是连接与互操作</strong>，不是替 Agent 设计工作流。Server 暴露 tools/resources/prompts，但”任务该怎么编排、何时调用、结果怎么审查”仍然由客户端与上层 Agent 逻辑决定。</li>
